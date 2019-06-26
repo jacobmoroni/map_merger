@@ -1,3 +1,3 @@
-# map_combiner
+# map_merger
 
-ros node to combine rtab_map point clouds from multiple agents
+ros node to merge rtab_map point clouds from multiple agents
