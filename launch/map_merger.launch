@@ -1,0 +1,12 @@
+<launch> 
+  <arg name="map0_topic" default="/sam_sim/rtabmap/mapData"/>
+  <!--<arg name="map1_topic" default="/bucky_sim/rtabmap/MapData"/>-->
+  <arg name="map1_topic" default="none"/>
+  <arg name="map2_topic" default="none"/>
+
+  <node name="map_merger" pkg="map_merger" type="map_merger" output="screen">
+    <param name="map0_topic" value="$(arg map0_topic)"/>
+    <param name="map1_topic" value="$(arg map1_topic)"/>
+    <param name="map2_topic" value="$(arg map2_topic)"/>
+  </node>
+</launch>

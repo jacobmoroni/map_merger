@@ -51,12 +51,13 @@ namespace map_merge
   nh_private_.param<std::string>("map1_topic", map1_topic_, "none");
   nh_private_.param<std::string>("map2_topic", map2_topic_, "none");
 
+  setupRtabParams();
+  mapsManager.init(nh_,nh_private_,"map_merginator",true);
+
   // Setup ROS hooks
   map0_subscriber_ = nh_.subscribe(map0_topic_, 1, &MapMerger::mapCallback0, this);
   map1_subscriber_ = nh_.subscribe(map0_topic_, 1, &MapMerger::mapCallback1, this);
   map2_subscriber_ = nh_.subscribe(map0_topic_, 1, &MapMerger::mapCallback2, this);
-
-
 
   // initialize static members of outgoing command
 }
@@ -69,6 +70,11 @@ void MapMerger::mapCallback0(const rtabmap_ros::MapData& msg)
   rtabmap_ros::NodeData node{msg.nodes.back()};
   rtabmap::Signature sig{rtabmap_ros::nodeDataFromROS(node)};
   nodesMap0.push_back(sig);
+  if (nodesMap0.size()%5 == 0)
+  {
+    mergeMaps();
+  }
+  std::cout<<nodesMap0.size()<<std::endl;
 }
 
 void MapMerger::mapCallback1(const rtabmap_ros::MapData& msg)
@@ -85,10 +91,8 @@ void MapMerger::mapCallback2(const rtabmap_ros::MapData& msg)
   nodesMap2.push_back(sig);
 }
 
-void MapMerger::mergeMaps()
+void MapMerger::setupRtabParams()
 {
-  // Merging request (a service or done each 30 sec), process each map one after the other
-  //
   std::string configPath;
   nh_private_.param("config_path", configPath, configPath);
 
@@ -118,6 +122,10 @@ void MapMerger::mergeMaps()
       ROS_ERROR( "Config file \"%s\" not found!", configPath.c_str());
     }
   }
+  else
+  {
+    parameters = rtabmap::Parameters::getDefaultParameters();
+  }
 //  rtabmap::ParametersMap parameters = rtabmap::Parameters::getDefaultParameters();
   // See example from MapAssembler to get all parameters from rosparam or arguments
 
@@ -125,48 +133,54 @@ void MapMerger::mergeMaps()
   parameters.at(rtabmap::Parameters::kDbSqlite3InMemory()) = "true";
 
 //  rtabmap::Rtabmap rtabmap(parameters...);
+//  rtabmap::Rtabmap
+  rtabmap_.init(parameters,"home/jacob/.ros/combomap.db");
+}
 
-//  rtabmap::Rtabmap rtabmap(parameters...);
-  rtabmap::Rtabmap rtabmap;
+void MapMerger::mergeMaps()
+{
+  // Merging request (a service or done each 30 sec), process each map one after the other
+  //
   if (map0_topic_ != "none")
   {
     for(std::list<rtabmap::Signature>::iterator iter=nodesMap0.begin(); iter!=nodesMap0.end();++iter)
     {
-       rtabmap::SensorData data = iter->sensorData();
-       data.uncompressData();
-       rtabmap.process(data, iter->getPose() , odomLinearVariance, odomAngularVariance);
+      rtabmap::SensorData data = iter->sensorData();
+      data.uncompressData();
+      rtabmap_.process(data, iter->getPose() , odomLinearVariance, odomAngularVariance);
     }
-    rtabmap.triggerNewMap(); // start a new session for the second robot
+//    rtabmap_.triggerNewMap(); // start a new session for the second robot
   }
 
   if (map1_topic_ != "none")
   {
+    std::cout<<"shouldnt be here"<<std::endl;
     for(std::list<rtabmap::Signature>::iterator iter=nodesMap1.begin(); iter!=nodesMap1.end();++iter)
     {
-       rtabmap::SensorData data = iter->sensorData();
+      rtabmap::SensorData data = iter->sensorData();
        data.uncompressData();
-       rtabmap.process(data, iter->getPose(), odomLinearVariance, odomAngularVariance);
+       rtabmap_.process(data, iter->getPose(), odomLinearVariance, odomAngularVariance);
     }
-    rtabmap.triggerNewMap(); // start a new session for the second robot
+    rtabmap_.triggerNewMap(); // start a new session for the third robot
   }
 
   if (map2_topic_ != "none")
   {
+    std::cout<<"here either"<<std::endl;
     for(std::list<rtabmap::Signature>::iterator iter=nodesMap2.begin(); iter!=nodesMap2.end();++iter)
     {
        rtabmap::SensorData data = iter->sensorData();
        data.uncompressData();
-       rtabmap.process(data, iter->getPose(), odomLinearVariance, odomAngularVariance);
+       rtabmap_.process(data, iter->getPose(), odomLinearVariance, odomAngularVariance);
     }
   }
   // Update and publish combined map
   mapsManager.clear();
   std::map<int, rtabmap::Transform> poses;
   std::multimap<int, rtabmap::Link> constraints;
-  rtabmap. getGraph(poses, constraints, true, true);
-  poses = mapsManager.updateMapCaches(poses, rtabmap.getMemory(), false, false);
+  rtabmap_.getGraph(poses, constraints, true, true);
+  poses = mapsManager.updateMapCaches(poses, rtabmap_.getMemory(), false, false);
   mapsManager.publishMaps(poses, ros::Time::now(), "map_combined");
-
 }
 
 } // namespace map_merger

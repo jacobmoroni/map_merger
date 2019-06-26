@@ -12,6 +12,7 @@
 #include <rtabmap_ros/MapData.h>
 #include <rtabmap/core/Signature.h>
 #include <rtabmap_ros/MapsManager.h>
+#include <rtabmap/core/Rtabmap.h>
 
 
 namespace map_merge
@@ -53,10 +54,13 @@ protected:
 
   //other functions
   void mergeMaps();
+  void setupRtabParams();
 
   MapsManager mapsManager;
   float odomLinearVariance{0.0001f};
   float odomAngularVariance{0.0005f};
+
+  rtabmap::Rtabmap rtabmap_;
 
 };
 
