@@ -61,6 +61,8 @@ MapMerger::~MapMerger()
 void MapMerger::mapCallback1(const rtabmap_ros::MapData& msg)
 {
   rtabmap_ros::NodeData node{msg.nodes.back()};
+  std::cout<<"MapData1 len: "<<msg.nodes.size()<<std::endl;
+  std::cout<<"nodesMap1 len: "<<nodesMap1.size()<<std::endl;
   rtabmap::Signature sig{rtabmap_ros::nodeDataFromROS(node)};
   nodesMap1.push_back(sig);
 
