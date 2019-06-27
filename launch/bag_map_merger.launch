@@ -1,7 +1,12 @@
-<launch> 
-  <arg name="map1_topic"            default="/rtabmap/mapData"/>
-  <!--<arg name="map2_topic"          default="/bucky_sim/rtabmap/MapData"/>-->
-  <arg name="map2_topic"            default="none"/>
+<launch>
+  <arg name="mav1"                  default="sam_sim"/>
+  <arg name="mav2"                  default="bucky_sim"/> 
+  <arg name="bag1"                  default="/home/jacob/.ros/$(arg mav1).bag"/>
+  <arg name="bag2"                  default="/home/jacob/.ros/$(arg mav2).bag"/>
+
+  <arg name="map1_topic"            default="/$(arg mav1)/rtabmap/mapData"/>
+  <arg name="map2_topic"            default="/$(arg mav2)/rtabmap/mapData"/>
+  <!--<arg name="map2_topic"            default="none"/>-->
   <arg name="map3_topic"            default="none"/>
 
   <arg name="base_frame"            default="world"/>
@@ -21,4 +26,10 @@
     <param name="odom_linear_variance"  value="$(arg odom_linear_variance)"/>
     <param name="odom_angular_variance" value="$(arg odom_angular_variance)"/>
   </node>
+
+  <node name="$(arg mav1)_player" pkg="rosbag" type="play" ns="$(arg mav1)" 
+    args="--clock $(arg bag1)"/>
+ 
+  <node name="$(arg mav2)_player" pkg="rosbag" type="play" ns="$(arg mav2)" 
+    args="--clock $(arg bag2)"/>
 </launch>

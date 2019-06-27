@@ -31,37 +31,40 @@ protected:
   ros::NodeHandle nh_;
   ros::NodeHandle nh_private_;
 
-  ros::Subscriber map0_subscriber_;
   ros::Subscriber map1_subscriber_;
   ros::Subscriber map2_subscriber_;
-
-  ros::Publisher  combined_map_publisher_;
+  ros::Subscriber map3_subscriber_;
 
   // topic names
-  std::string map0_topic_;
   std::string map1_topic_;
   std::string map2_topic_;
+  std::string map3_topic_;
+
+  // ros parameters
+  int merge_freq_;
+  float odom_linear_variance_{0.0001f};
+  float odom_angular_variance_{0.0005f};
+  std::string config_path_;
+  std::string db_location_;
+  std::string base_frame_;
 
   // callbacks
-  void mapCallback0(const rtabmap_ros::MapData& msg);
   void mapCallback1(const rtabmap_ros::MapData& msg);
   void mapCallback2(const rtabmap_ros::MapData& msg);
+  void mapCallback3(const rtabmap_ros::MapData& msg);
 
   // data storage
-  std::list<rtabmap::Signature> nodesMap0;
   std::list<rtabmap::Signature> nodesMap1;
   std::list<rtabmap::Signature> nodesMap2;
+  std::list<rtabmap::Signature> nodesMap3;
 
   //other functions
   void mergeMaps();
   void setupRtabParams();
 
-  MapsManager mapsManager;
-  float odomLinearVariance{0.0001f};
-  float odomAngularVariance{0.0005f};
-
+  //member classes
+  MapsManager maps_manager_;
   rtabmap::Rtabmap rtabmap_;
-
 };
 
 } //end namespace
