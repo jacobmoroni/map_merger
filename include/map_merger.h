@@ -67,13 +67,11 @@ protected:
   std::list<rtabmap::Signature> temp_nodes_map2;
   std::list<rtabmap::Signature> temp_nodes_map3;
 
-
-      //other functions
-      void
-      mergeMaps();
+  // other functions
+  void mergeMaps();
   void setupRtabParams();
 
-  //member classes
+  // member classes
   MapsManager maps_manager_;
   rtabmap::Rtabmap rtabmap_;
 

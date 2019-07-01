@@ -86,16 +86,9 @@ void MapMerger::mapCallback1(const rtabmap_ros::MapData& msg)
 {
   lock.lock();
   rtabmap_ros::NodeData node{msg.nodes.back()};
-  std::cout<<"MapData1 len: "<<msg.nodes.size()<<std::endl;
-  std::cout<<"nodes_map1 len: "<<nodes_map1.size()<<std::endl;
   rtabmap::Signature sig{rtabmap_ros::nodeDataFromROS(node)};
   nodes_map1.push_back(sig);
   lock.unlock();
-  // merge maps every merge_freq_ messages that come in (messages come at 1hz by default)
-  // if (nodes_map1.size()%static_cast<unsigned long>(merge_freq_) == 0)
-  // {
-  //   mergeMaps();
-  // }
 }
 
 void MapMerger::mapCallback2(const rtabmap_ros::MapData& msg)
