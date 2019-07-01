@@ -1,8 +1,10 @@
 <launch>
+
   <arg name="mav1"                  default="sam"/>
   <arg name="mav2"                  default="bucky"/> 
   <arg name="bag1"                  default="/home/jacob/.ros/sam_lab1.bag"/>
   <arg name="bag2"                  default="/home/jacob/.ros/sam_lab2.bag"/>
+
 
   <arg name="map1_topic"            default="/$(arg mav1)/rtabmap/mapData"/>
   <arg name="map2_topic"            default="/$(arg mav2)/rtabmap/mapData"/>
