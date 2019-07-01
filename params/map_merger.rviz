@@ -75,7 +75,7 @@ Visualization Manager:
       Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
-      Size (Pixels): 5
+      Size (Pixels): 2
       Size (m): 0.009999999776482582
       Style: Points
       Topic: /cloud_map
@@ -111,25 +111,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 30.445850372314453
+      Distance: 23.85702896118164
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -3.6842339038848877
-        Y: 3.8853793144226074
-        Z: -3.2638754844665527
+        X: -0.7699944972991943
+        Y: 4.146514892578125
+        Z: -3.2836079597473145
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.329796552658081
+      Pitch: 0.8297971487045288
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.1154212951660156
+      Yaw: 4.770432472229004
     Saved: ~
 Window Geometry:
   Displays:
