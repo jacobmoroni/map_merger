@@ -144,6 +144,12 @@ void MapMerger::setupRtabParams()
 
   // Keep everything in RAM
   parameters.at(rtabmap::Parameters::kDbSqlite3InMemory()) = "true";
+  // std::string blah;
+  // rtabmap::ParametersMap all_params;
+  // rtabmap::ParametersMap::iterator iter;
+  // iter = all_params.find("Grid/MaxObstacleHeight");
+  // blah = iter->first;
+  // std::cout<<"PARAMETER = "<<blah<<std::endl;
   rtabmap_.init(parameters,db_location_);
   
   // Set up map booleans

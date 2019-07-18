@@ -2,9 +2,11 @@
 
   <arg name="mav1"                  default="sam"/>
   <arg name="mav2"                  default="bucky"/> 
-  <arg name="bag1"                  default="/home/jacob/.ros/sam_lab1.bag"/>
-  <arg name="bag2"                  default="/home/jacob/.ros/sam_lab2.bag"/>
+  <!--<arg name="bag1"                  default="/home/jacob/.ros/sam_lab1.bag"/>-->
+  <!--<arg name="bag2"                  default="/home/jacob/.ros/sam_lab2.bag"/>-->
 
+  <arg name="bag1"                  default="/home/jacob/.ros/sam_sim2.bag"/>
+  <arg name="bag2"                  default="/home/jacob/.ros/sam_sim3.bag"/>
 
   <arg name="map1_topic"            default="/$(arg mav1)/rtabmap/mapData"/>
   <arg name="map2_topic"            default="/$(arg mav2)/rtabmap/mapData"/>
@@ -28,6 +30,7 @@
     <param name="map_merge_frequency"   value="$(arg map_merge_frequency)"/>
     <param name="odom_linear_variance"  value="$(arg odom_linear_variance)"/>
     <param name="odom_angular_variance" value="$(arg odom_angular_variance)"/>
+    <param name="Grid/MaxObstacleHeight" value="0.5"/>
   </node>
   
   <!-- Play first robot bag -->
