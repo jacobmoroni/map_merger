@@ -41,7 +41,7 @@ Visualization Manager:
       Cell Size: 1
       Class: rviz/Grid
       Color: 160; 160; 164
-      Enabled: true
+      Enabled: false
       Line Style:
         Line Width: 0.029999999329447746
         Value: Lines
@@ -54,7 +54,7 @@ Visualization Manager:
       Plane: XY
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
-      Value: true
+      Value: false
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -67,7 +67,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: RGB8
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 4096
@@ -81,44 +81,6 @@ Visualization Manager:
       Size (m): 0.009999999776482582
       Style: Points
       Topic: /cloud_map
-      Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: true
-    - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
-        Value: true
-      Axis: Z
-      Channel Name: intensity
-      Class: rtabmap_ros/MapCloud
-      Cloud decimation: 4
-      Cloud from scan: false
-      Cloud max depth (m): 4
-      Cloud min depth (m): 0
-      Cloud voxel size (m): 0.009999999776482582
-      Color: 255; 255; 255
-      Color Transformer: RGB8
-      Download graph: false
-      Download map: false
-      Enabled: false
-      Filter ceiling (m): 0
-      Filter floor (m): 0
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Max Intensity: 4096
-      Min Color: 0; 0; 0
-      Min Intensity: 0
-      Name: MapCloud
-      Node filtering angle (degrees): 30
-      Node filtering radius (m): 0
-      Position Transformer: XYZ
-      Size (Pixels): 3
-      Size (m): 0.05000000074505806
-      Style: Points
-      Topic: /bucky/rtabmap/mapData
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -141,7 +103,7 @@ Visualization Manager:
       Color Transformer: RGB8
       Download graph: false
       Download map: false
-      Enabled: false
+      Enabled: true
       Filter ceiling (m): 0
       Filter floor (m): 0
       Invert Rainbow: false
@@ -154,8 +116,46 @@ Visualization Manager:
       Node filtering radius (m): 0
       Position Transformer: XYZ
       Size (Pixels): 3
+      Size (m): 0.05000000074505806
+      Style: Points
+      Topic: /comboMapData
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rtabmap_ros/MapCloud
+      Cloud decimation: 4
+      Cloud from scan: false
+      Cloud max depth (m): 4
+      Cloud min depth (m): 0
+      Cloud voxel size (m): 0.009999999776482582
+      Color: 255; 255; 255
+      Color Transformer: RGB8
+      Download graph: false
+      Download map: false
+      Enabled: false
+      Filter ceiling (m): 0.8999999761581421
+      Filter floor (m): 0
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: MapCloud
+      Node filtering angle (degrees): 30
+      Node filtering radius (m): 0
+      Position Transformer: XYZ
+      Size (Pixels): 3
       Size (m): 0.009999999776482582
-      Style: Flat Squares
+      Style: Points
       Topic: /sam/rtabmap/mapData
       Unreliable: false
       Use Fixed Frame: true
@@ -189,25 +189,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 20.957523345947266
+      Distance: 70.12149047851562
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 2.2553579807281494
-        Y: 0.9164831042289734
-        Z: 0.009828612208366394
+        X: 19.802453994750977
+        Y: 7.359872341156006
+        Z: -5.074679374694824
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.35979849100112915
+      Pitch: 0.5997986793518066
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.9072771072387695
+      Yaw: 4.672283172607422
     Saved: ~
 Window Geometry:
   Displays:

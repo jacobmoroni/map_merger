@@ -1,23 +1,47 @@
 <launch> 
+  <!-- Names of agents -->
   <arg name="mav1"                  default="sam"/>
   <arg name="mav2"                  default="bucky"/> 
-  
+  <arg name="mav3"                  default="steve"/>
+
+  <!-- Topics where mapData is being published from each agent -->
   <arg name="map1_topic"            default="/$(arg mav1)/rtabmap/mapData"/>
   <arg name="map2_topic"            default="/$(arg mav2)/rtabmap/mapData"/>
   <!--<arg name="map2_topic"            default="none"/>-->
   <arg name="map3_topic"            default="none"/>
 
+  <!-- Topic where the combined MapData will be published -->
+  <arg name="combined_map_topic"    default="comboMapData"/>
+  
+  <!-- boolean arguments used when generating the map same as variables -->
+  <!-- used when calling rtabmap/get_map_data service -->
+  <arg name="merge_map_optimized"   default="true"/>
+  <arg name="merge_map_global"      default="true"/>
+
+  <!-- tf frame that published combined map is connected to --> 
   <arg name="base_frame"            default="world"/>
+  
+  <!-- Location where combined map rtabmap database file will be saved -->
   <arg name="db_location"           default="/home/jacob/.ros/mapmerge.db"/>
+
+  <!-- Location of rtabmap config parameter file, uncomment to use -->
   <!--<arg name="config_path"         default=""/>-->
+
+  <!-- How ofted to merge the maps together (in seconds) -->
   <arg name="map_merge_frequency"   default="5"/>
+  
+  <!-- Parameters used in map optimization -->
   <arg name="odom_linear_variance"  default="0.0001"/>
   <arg name="odom_angular_variance" default="0.0005"/>
 
+  <!-- Launch Map Merger Node -->
   <node name="map_merger" pkg="map_merger" type="map_merger" output="screen">
     <param name="map1_topic"            value="$(arg map1_topic)"/>
     <param name="map2_topic"            value="$(arg map2_topic)"/>
     <param name="map3_topic"            value="$(arg map3_topic)"/>
+    <param name="combined_map_topic"    value="$(arg combined_map_topic)"/>
+    <param name="merge_map_optimized"   value="$(arg merge_map_optimized)"/>
+    <param name="merge_map_global"      value="$(arg merge_map_global)"/>
     <param name="base_frame"            value="$(arg base_frame)"/>
     <param name="db_location"           value="$(arg db_location)"/>
     <param name="map_merge_frequency"   value="$(arg map_merge_frequency)"/>

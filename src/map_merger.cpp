@@ -31,11 +31,11 @@ namespace map_merge
   nh_(ros::NodeHandle()),
   nh_private_(ros::NodeHandle("~"))
 {
-
   // Topic Params
   nh_private_.param<std::string>("map1_topic", map1_topic_, "none");
   nh_private_.param<std::string>("map2_topic", map2_topic_, "none");
   nh_private_.param<std::string>("map3_topic", map3_topic_, "none");
+  nh_private_.param<std::string>("combined_map_topic", combo_map_topic_, "comboMapData");
 
   // Other ROS params
   nh_private_.param<std::string>("base_frame", base_frame_, "world");
@@ -44,16 +44,21 @@ namespace map_merge
   nh_private_.param<double>("map_merge_frequency", merge_freq_, 5);
   nh_private_.param<float>("odom_linear_variance", odom_linear_variance_,0.0001f);
   nh_private_.param<float>("odom_angular_variance", odom_angular_variance_, 0.0005f);
+  nh_private_.param<bool>("merge_map_optimized", merge_map_optimized_, true);
+  nh_private_.param<bool>("merge_map_global", merge_map_global_, true);
 
   // Initialize rtabmap instance and maps manager
   setupRtabParams();
   maps_manager_.init(nh_,nh_private_,"map_merge_manager",true);
+  map_to_odom_ = rtabmap::Transform::getIdentity();
 
   // Setup ROS hooks
   map1_subscriber_ = nh_.subscribe(map1_topic_, 1, &MapMerger::mapCallback1, this);
   map2_subscriber_ = nh_.subscribe(map2_topic_, 1, &MapMerger::mapCallback2, this);
   map3_subscriber_ = nh_.subscribe(map3_topic_, 1, &MapMerger::mapCallback3, this);
   update_map_timer_ = nh_.createTimer(ros::Duration(merge_freq_), &MapMerger::timerCallback, this);
+
+  map_data_pub_ = nh_.advertise<rtabmap_ros::MapData>(combo_map_topic_, 1);
   std::cout<<"MAP TOPICS: "<< map1_topic_<<", "<< map2_topic_<<", "<<map3_topic_<<std::endl;
 }
 
@@ -144,14 +149,9 @@ void MapMerger::setupRtabParams()
 
   // Keep everything in RAM
   parameters.at(rtabmap::Parameters::kDbSqlite3InMemory()) = "true";
-  // std::string blah;
-  // rtabmap::ParametersMap all_params;
-  // rtabmap::ParametersMap::iterator iter;
-  // iter = all_params.find("Grid/MaxObstacleHeight");
-  // blah = iter->first;
-  // std::cout<<"PARAMETER = "<<blah<<std::endl;
+
   rtabmap_.init(parameters,db_location_);
-  
+
   // Set up map booleans
   if (map1_topic_ != "none")
     map1_ = true;
@@ -159,6 +159,36 @@ void MapMerger::setupRtabParams()
     map2_ = true;
   if (map3_topic_ != "none")
     map3_ = true;
+}
+
+void MapMerger::publishComboMapData()
+{
+  std::map<int, rtabmap::Transform> poses_md;
+  std::multimap<int, rtabmap::Link> constraints_md;
+  std::map<int, rtabmap::Signature> signatures_md;
+
+  // Set _md variables from map date created in mergeMaps()
+  rtabmap_.get3DMap(signatures_md,
+                    poses_md,
+                    constraints_md,
+                    merge_map_optimized_,
+                    merge_map_global_);
+
+  // setup mapdata message
+  rtabmap_ros::MapDataPtr msg(new rtabmap_ros::MapData);
+  ros::Time now = ros::Time::now();
+  msg->header.stamp = now;
+  msg->header.frame_id = base_frame_;
+
+  // push mapdata to ros message
+  rtabmap_ros::mapDataToROS(poses_md,
+                            constraints_md,
+                            signatures_md,
+                            map_to_odom_,
+                            *msg);
+
+  // publish message
+  map_data_pub_.publish(msg);
 }
 
 void MapMerger::mergeMaps()
@@ -213,8 +243,10 @@ void MapMerger::mergeMaps()
 
   // map is published as pointcloud2 /cloud_map connected to the base_frame_
   maps_manager_.publishMaps(poses, ros::Time::now(), base_frame_);
+
+  // Publish mas as MapData Topic which allows for setting max ceiling height
+  // and floor height to improve map readability
+  publishComboMapData();
 }
 
 } // namespace map_merger
-
-

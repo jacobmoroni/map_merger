@@ -35,6 +35,8 @@ protected:
   ros::Subscriber map1_subscriber_;
   ros::Subscriber map2_subscriber_;
   ros::Subscriber map3_subscriber_;
+  
+  ros::Publisher map_data_pub_;
 
   ros::Timer update_map_timer_;
 
@@ -44,6 +46,7 @@ protected:
   std::string map1_topic_;
   std::string map2_topic_;
   std::string map3_topic_;
+  std::string combo_map_topic_;
 
   // ros parameters
   double merge_freq_;
@@ -52,6 +55,8 @@ protected:
   std::string config_path_;
   std::string db_location_;
   std::string base_frame_;
+  bool merge_map_optimized_;
+  bool merge_map_global_;
 
   // callbacks
   void mapCallback1(const rtabmap_ros::MapData& msg);
@@ -70,10 +75,12 @@ protected:
   // other functions
   void mergeMaps();
   void setupRtabParams();
+  void publishComboMapData();
 
   // member classes
   MapsManager maps_manager_;
   rtabmap::Rtabmap rtabmap_;
+  rtabmap::Transform map_to_odom_;
 
   // Map Booleans
   bool map1_{false};
