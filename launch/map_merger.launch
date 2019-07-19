@@ -1,7 +1,10 @@
 <launch> 
-  <arg name="map1_topic"            default="/rtabmap/mapData"/>
-  <!--<arg name="map2_topic"          default="/bucky_sim/rtabmap/MapData"/>-->
-  <arg name="map2_topic"            default="none"/>
+  <arg name="mav1"                  default="sam"/>
+  <arg name="mav2"                  default="bucky"/> 
+  
+  <arg name="map1_topic"            default="/$(arg mav1)/rtabmap/mapData"/>
+  <arg name="map2_topic"            default="/$(arg mav2)/rtabmap/mapData"/>
+  <!--<arg name="map2_topic"            default="none"/>-->
   <arg name="map3_topic"            default="none"/>
 
   <arg name="base_frame"            default="world"/>
@@ -21,4 +24,8 @@
     <param name="odom_linear_variance"  value="$(arg odom_linear_variance)"/>
     <param name="odom_angular_variance" value="$(arg odom_angular_variance)"/>
   </node>
+  
+  <!-- Run RVIZ -->
+  <node type="rviz" name="rviz" pkg="rviz" 
+    args="-d $(find map_merger)/params/map_merger.rviz" />
 </launch>
