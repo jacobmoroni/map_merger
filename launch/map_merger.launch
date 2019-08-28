@@ -28,7 +28,7 @@
   <!--<arg name="config_path"         default=""/>-->
 
   <!-- How ofted to merge the maps together (in seconds) -->
-  <arg name="map_merge_frequency"   default="5"/>
+  <arg name="map_merge_frequency"   default="1"/>
   
   <!-- Parameters used in map optimization -->
   <arg name="odom_linear_variance"  default="0.0001"/>

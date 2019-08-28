@@ -35,6 +35,7 @@ namespace map_merge
   nh_private_.param<std::string>("map1_topic", map1_topic_, "none");
   nh_private_.param<std::string>("map2_topic", map2_topic_, "none");
   nh_private_.param<std::string>("map3_topic", map3_topic_, "none");
+  nh_private_.param<std::string>("map4_topic", map4_topic_, "none");
   nh_private_.param<std::string>("combined_map_topic", combo_map_topic_, "comboMapData");
 
   // Other ROS params
@@ -56,10 +57,12 @@ namespace map_merge
   map1_subscriber_ = nh_.subscribe(map1_topic_, 1, &MapMerger::mapCallback1, this);
   map2_subscriber_ = nh_.subscribe(map2_topic_, 1, &MapMerger::mapCallback2, this);
   map3_subscriber_ = nh_.subscribe(map3_topic_, 1, &MapMerger::mapCallback3, this);
+  map4_subscriber_ = nh_.subscribe(map4_topic_, 1, &MapMerger::mapCallback4, this);
   update_map_timer_ = nh_.createTimer(ros::Duration(merge_freq_), &MapMerger::timerCallback, this);
 
   map_data_pub_ = nh_.advertise<rtabmap_ros::MapData>(combo_map_topic_, 1);
-  std::cout<<"MAP TOPICS: "<< map1_topic_<<", "<< map2_topic_<<", "<<map3_topic_<<std::endl;
+  std::cout<<"MAP TOPICS: "<< map1_topic_<<", "<< map2_topic_<<", "<< map3_topic_<<", "<< map4_topic_<<std::endl;
+  update_now_ = true;
 }
 
 MapMerger::~MapMerger()
@@ -68,23 +71,32 @@ MapMerger::~MapMerger()
 void MapMerger::timerCallback(const ros::TimerEvent& msg)
 {
   std::stringstream nodes_message;
-  lock.lock();
-  nodes_message <<"Merging Maps, Map1 Nodes: " << nodes_map1.size();
-  temp_nodes_map1 = nodes_map1;
-  if (map2_)
+  std::cout<<"timer called"<<std::endl;
+  if (update_now_)
   {
-    nodes_message << ", Map2 Nodes:" << nodes_map2.size();
-    temp_nodes_map2 = nodes_map2;
+    lock.lock();
+    nodes_message <<"Merging Maps, Map1 Nodes: " << nodes_map1.size();
+    temp_nodes_map1 = nodes_map1;
+    if (map2_)
+    {
+      nodes_message << ", Map2 Nodes:" << nodes_map2.size();
+      temp_nodes_map2 = nodes_map2;
+    }
+    if (map3_)
+    {
+      nodes_message << ", Map3 Nodes:" << nodes_map3.size();
+      temp_nodes_map3 = nodes_map3;
+    }
+    if (map4_)
+    {
+      nodes_message << ", Map4 Nodes:" << nodes_map4.size();
+      temp_nodes_map4 = nodes_map4;
+    }
+    nodes_message<<std::endl;
+    std::cout << nodes_message.str();
+    lock.unlock();
+    mergeMaps();
   }
-  if (map3_)
-  {
-    nodes_message << ", Map3 Nodes:" << nodes_map3.size();
-    temp_nodes_map3 = nodes_map3;
-  }
-  nodes_message<<std::endl;
-  std::cout << nodes_message.str();
-  lock.unlock();
-  mergeMaps();
 }
 
 void MapMerger::mapCallback1(const rtabmap_ros::MapData& msg)
@@ -111,6 +123,15 @@ void MapMerger::mapCallback3(const rtabmap_ros::MapData& msg)
   rtabmap_ros::NodeData node{msg.nodes.back()};
   rtabmap::Signature sig{rtabmap_ros::nodeDataFromROS(node)};
   nodes_map3.push_back(sig);
+  lock.unlock();
+}
+
+void MapMerger::mapCallback4(const rtabmap_ros::MapData& msg)
+{
+  lock.lock();
+  rtabmap_ros::NodeData node{msg.nodes.back()};
+  rtabmap::Signature sig{rtabmap_ros::nodeDataFromROS(node)};
+  nodes_map4.push_back(sig);
   lock.unlock();
 }
 
@@ -159,6 +180,8 @@ void MapMerger::setupRtabParams()
     map2_ = true;
   if (map3_topic_ != "none")
     map3_ = true;
+  if (map4_topic_ != "none")
+    map4_ = true;
 }
 
 void MapMerger::publishComboMapData()
@@ -194,44 +217,62 @@ void MapMerger::publishComboMapData()
 void MapMerger::mergeMaps()
 {
   // Merging request, process each map one after the other
-
+  update_now_ = false;
   if (map1_)
   {
-    for(std::list<rtabmap::Signature>::iterator iter=temp_nodes_map1.begin(); iter!=temp_nodes_map1.end();++iter)
+    for(std::list<rtabmap::Signature>::iterator iter=std::next(temp_nodes_map1.begin(),std::max(0,map1_len_-5)); iter!=temp_nodes_map1.end();++iter)
     {
       rtabmap::SensorData data = iter->sensorData();
       data.uncompressData();
       rtabmap_.process(data, iter->getPose() , odom_linear_variance_, odom_angular_variance_);
+      map1_len_ ++;
     }
     std::cout<<"Scanned Map 1: "<< temp_nodes_map1.size()<<" nodes in map."<<std::endl;
-    if (map2_ | map3_)
+    if (map2_ | map3_ | map4_)
       std::cout<<"Triggering new map"<<std::endl;
       rtabmap_.triggerNewMap(); // start a new session for the second robot
   }
 
   if (map2_)
   {
-    for(std::list<rtabmap::Signature>::iterator iter=temp_nodes_map2.begin(); iter!=temp_nodes_map2.end();++iter)
+    for(std::list<rtabmap::Signature>::iterator iter=std::next(temp_nodes_map2.begin(),std::max(0,map2_len_-5)); iter!=temp_nodes_map2.end();++iter)
     {
       rtabmap::SensorData data = iter->sensorData();
       data.uncompressData();
       rtabmap_.process(data, iter->getPose(), odom_linear_variance_, odom_angular_variance_);
+      map2_len_++;
     }
     std::cout<<"Scanned Map 2: "<< temp_nodes_map2.size()<<" nodes in map."<<std::endl;
-    if (map3_)
+    if (map3_ | map4_)
       std::cout<<"Triggering new map"<<std::endl;
       rtabmap_.triggerNewMap(); // start a new session for the third robot
   }
 
   if (map3_)
+    {
+      for(std::list<rtabmap::Signature>::iterator iter=std::next(temp_nodes_map3.begin(),std::max(0,map3_len_-5)); iter!=temp_nodes_map3.end();++iter)
+      {
+        rtabmap::SensorData data = iter->sensorData();
+        data.uncompressData();
+        rtabmap_.process(data, iter->getPose(), odom_linear_variance_, odom_angular_variance_);
+        map3_len_++;
+      }
+      std::cout<<"Scanned Map 3: "<< temp_nodes_map3.size()<<" nodes in map."<<std::endl;
+      if (map4_ )
+        std::cout<<"Triggering new map"<<std::endl;
+        rtabmap_.triggerNewMap(); // start a new session for the third robot
+    }
+
+  if (map4_)
   {
-    for(std::list<rtabmap::Signature>::iterator iter=temp_nodes_map3.begin(); iter!=temp_nodes_map3.end();++iter)
+    for(std::list<rtabmap::Signature>::iterator iter=std::next(temp_nodes_map4.begin(),std::max(0,map4_len_-5)); iter!=temp_nodes_map4.end();++iter)
     {
       rtabmap::SensorData data = iter->sensorData();
       data.uncompressData();
       rtabmap_.process(data, iter->getPose(), odom_linear_variance_, odom_angular_variance_);
+      map4_len_++;
     }
-    std::cout<<"Scanned Map 3: "<< temp_nodes_map3.size()<<" nodes in map."<<std::endl;
+    std::cout<<"Scanned Map 4: "<< temp_nodes_map4.size()<<" nodes in map."<<std::endl;
   }
 
   // Update and publish combined map
@@ -247,6 +288,7 @@ void MapMerger::mergeMaps()
   // Publish mas as MapData Topic which allows for setting max ceiling height
   // and floor height to improve map readability
   publishComboMapData();
+  update_now_ = true;
 }
 
 } // namespace map_merger

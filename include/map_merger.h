@@ -35,6 +35,7 @@ protected:
   ros::Subscriber map1_subscriber_;
   ros::Subscriber map2_subscriber_;
   ros::Subscriber map3_subscriber_;
+  ros::Subscriber map4_subscriber_;
   
   ros::Publisher map_data_pub_;
 
@@ -46,6 +47,7 @@ protected:
   std::string map1_topic_;
   std::string map2_topic_;
   std::string map3_topic_;
+  std::string map4_topic_;
   std::string combo_map_topic_;
 
   // ros parameters
@@ -62,15 +64,22 @@ protected:
   void mapCallback1(const rtabmap_ros::MapData& msg);
   void mapCallback2(const rtabmap_ros::MapData& msg);
   void mapCallback3(const rtabmap_ros::MapData& msg);
+  void mapCallback4(const rtabmap_ros::MapData& msg);
   void timerCallback(const ros::TimerEvent& event);
 
   // data storage
   std::list<rtabmap::Signature> nodes_map1;
   std::list<rtabmap::Signature> nodes_map2;
-  std::list<rtabmap::Signature> nodes_map3;
+  std::list<rtabmap::Signature> nodes_map3;  
+  std::list<rtabmap::Signature> nodes_map4;
   std::list<rtabmap::Signature> temp_nodes_map1;
   std::list<rtabmap::Signature> temp_nodes_map2;
   std::list<rtabmap::Signature> temp_nodes_map3;
+  std::list<rtabmap::Signature> temp_nodes_map4;
+  int map1_len_{0};
+  int map2_len_{0};
+  int map3_len_{0};
+  int map4_len_{0};
 
   // other functions
   void mergeMaps();
@@ -86,6 +95,8 @@ protected:
   bool map1_{false};
   bool map2_{false};
   bool map3_{false};
+  bool map4_{false};
+  bool update_now_{false};
 };
 
 } //end namespace

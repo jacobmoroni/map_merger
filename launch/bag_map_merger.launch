@@ -3,21 +3,30 @@
   <arg name="mav1"                  default="sam"/>
   <arg name="mav2"                  default="bucky"/> 
   <arg name="mav3"                  default="steve"/>
+  <arg name="mav4"                  default="sharon"/>
 
   <!-- Locations of bags -->
-  <arg name="bag1"                  default="/home/jacob/.ros/07192019/sam_07192019_test1.bag"/>
-  <arg name="bag2"                  default="/home/jacob/.ros/07192019/bucky_07192019_test1.bag"/>
+<!--  <arg name="bag1"            default="/home/jacob/.ros/07192019/sam_07192019_test1.bag"/>-->
+  <!--<arg name="bag2"            default="/home/jacob/.ros/07192019/bucky_07192019_test1.bag"/>-->
+  <!--<arg name="bag3"            default="/home/jacob/.ros/07192019/sam_07192019_test2.bag"/>-->
   <!--<arg name="bag1"                  default="/home/jacob/.ros/sam_sim2.bag"/>-->
   <!--<arg name="bag2"                  default="/home/jacob/.ros/sam_sim3.bag"/>-->
   <!--<arg name="bag1"                  default="/home/jacob/.ros/sam_lab1.bag"/>-->
   <!--<arg name="bag2"                  default="/home/jacob/.ros/sam_lab2.bag"/>-->
-  <arg name="bag3"                  default="/home/jacob/.ros/07192019/sam_07192019_test2.bag"/>
+
+  <arg name="bag1"                  default="/home/jacob/Documents/good_bags/wilk3_2.bag"/>
+  <arg name="bag2"                  default="/home/jacob/Documents/good_bags/wilk3_3.bag"/>
+  <arg name="bag3"                  default="/home/jacob/Documents/good_bags/wilk3_4.bag"/>
+  <arg name="bag4"                  default="/home/jacob/Documents/good_bags/wilk3_5.bag"/>
 
   <!-- Topics where mapData is being published from each agent -->
   <arg name="map1_topic"            default="/$(arg mav1)/rtabmap/mapData"/>
   <arg name="map2_topic"            default="/$(arg mav2)/rtabmap/mapData"/>
+  <!--<arg name="map2_topic"            default="none"/>-->
   <arg name="map3_topic"            default="/$(arg mav3)/rtabmap/mapData"/>
   <!--<arg name="map3_topic"            default="none"/>-->
+  <arg name="map4_topic"            default="/$(arg mav4)/rtabmap/mapData"/>
+  <!--<arg name="map4_topic"            default="none"/>-->
   
   <!-- Topic where the combined MapData will be published -->
   <arg name="combined_map_topic"    default="comboMapData"/>
@@ -37,7 +46,7 @@
   <!--<arg name="config_path"         default=""/>-->
 
   <!-- How ofted to merge the maps together (in seconds) -->
-  <arg name="map_merge_frequency"   default="30"/>
+  <arg name="map_merge_frequency"   default="265"/>
 
   <!-- Parameters used in map optimization -->
   <arg name="odom_linear_variance"  default="0.0001"/>
@@ -48,6 +57,7 @@
     <param name="map1_topic"            value="$(arg map1_topic)"/>
     <param name="map2_topic"            value="$(arg map2_topic)"/>
     <param name="map3_topic"            value="$(arg map3_topic)"/>
+    <param name="map4_topic"            value="$(arg map4_topic)"/>
     <param name="combined_map_topic"    value="$(arg combined_map_topic)"/>
     <param name="merge_map_optimized"   value="$(arg merge_map_optimized)"/>
     <param name="merge_map_global"      value="$(arg merge_map_global)"/>
@@ -63,14 +73,19 @@
   <node name="$(arg mav1)_player" pkg="rosbag" type="play" ns="$(arg mav1)" 
     args="--clock $(arg bag1)"/>
 
-  <!-- Play second robot bag -->
+   <!--Play second robot bag -->
   <node name="$(arg mav2)_player" pkg="rosbag" type="play" ns="$(arg mav2)" 
     args="--clock $(arg bag2)"/>
 
-   Play third robot bag 
+
+   <!--Play third robot bag -->
   <node name="$(arg mav3)_player" pkg="rosbag" type="play" ns="$(arg mav3)" 
      args="--clock $(arg bag3)"/>
 
+   <!--Play third robot bag -->
+  <node name="$(arg mav4)_player" pkg="rosbag" type="play" ns="$(arg mav4)" 
+     args="--clock $(arg bag4)"/>
+   
   <!-- Run RVIZ -->
   <node type="rviz" name="rviz" pkg="rviz" 
     args="-d $(find map_merger)/params/map_merger.rviz" />
